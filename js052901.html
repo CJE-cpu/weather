@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{margin: 0; padding: 0;}
+        body{
+            background-image: linear-gradient(0deg, #fabf50, #feefab, #e1a1f8);
+        }
+        .wrap{
+            width: 100%;
+            height: 1500px;
+            display: flex;
+            flex-direction: column;
+        }
+        h2{
+            margin: 50px auto;
+            font-size: 42px;
+        }
+        img{
+            width: 12rem;
+        }
+        .weather{
+            width: 1500px;
+            margin: 50px auto;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2),
+                        inset 4px 4px 2px rgba(255, 255, 255, 0.5);
+
+            padding: 100px;
+            gap: 20px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .weather div{
+            font-size: 30px;
+            font-weight: bold;
+        }
+        #time{
+            width: 100%;
+            text-align: right;
+        }
+        #show{
+            width: 100%;
+            gap: 50px;
+            margin-top: 100px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+        #card{
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 255, 255, 1);
+            border-radius: 10px;
+        }
+        #card div{
+            font-size: 25px;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <!-- api :: 브라우저가 서버기능(데이터)을 호출하는 규칙 -->
+     <div class="wrap">
+        <h2>날씨</h2>
+        <div class="weather">
+            <div id="time"></div>
+            <div id="show">
+                <div id="card">
+                    <div class="city"></div>
+                    <img class="weaicon" id="con" alt="날씨아이콘"/>
+                    <div class="temp" id="dis"></div>
+                    <div class="wind" id="wind"></div>
+                </div>
+                <div id="card">
+                    <div class="city"></div>
+                    <img class="weaicon" id="con2" alt="날씨아이콘"/>
+                    <div class="temp" id="dis2"></div>
+                    <div class="wind" id="wind2"></div>
+                </div>
+                <div id="card">
+                    <div class="city"></div>
+                    <img class="weaicon" id="con3" alt="날씨아이콘"/>
+                    <div class="temp" id="dis3"></div>
+                    <div class="wind" id="wind3"></div>
+                </div>
+                <div id="card">
+                    <div class="city"></div>
+                    <img class="weaicon" id="con4" alt="날씨아이콘"/>
+                    <div class="temp" id="dis4"></div>
+                    <div class="wind" id="wind4"></div>
+                </div>
+            </div>
+        </div>
+        
+     </div>
+    <script>
+        let temps = document.querySelectorAll(".temp")
+        let city = document.querySelectorAll(".city")
+        let weaicon = document.querySelectorAll(".weaicon")
+        let winds = document.querySelectorAll(".wind")
+        let cities = ['Seoul', 'Busan', 'Cheonan', 'Ansan']
+        let res = []
+        let data = []
+        const API_KEY = "5c118fa0acb8a543700e8951140e9cfc"
+        // const cityname = 'Cheonan'
+        async function getWeather(){
+            for(let i = 0; i < cities.length; i++){
+                res[i] = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cities[i]}&appid=${API_KEY}&units=metric&lang=kr`)
+                data[i] = await res[i].json()
+                console.log(data[i].clouds)
+            }
+            let clo = function(){
+                let time = document.querySelector("#time")
+                let dat = new Date()
+                let now = `${dat.getHours()} : ${dat.getMinutes()} : ${dat.getSeconds()}`
+                time.innerHTML = "현재 시각 : " + now
+            }
+            setInterval(clo, 1000)
+            temps.forEach((item, idx)=>{
+                item.innerHTML = "오늘의 온도 : " + data[idx].main.temp + "℃";
+            })
+            winds.forEach((item, idx)=>{
+                item.innerHTML = "오늘의 풍속 : " + data[idx].wind.speed
+            })
+            city.forEach((item, idx)=>{
+                item.innerHTML = `<b>${cities[idx]}`
+            })
+
+            weaicon.forEach((item, idx)=>{
+                let Url = ''
+                if(data[idx].clouds.all > 10){
+                    Url = 'https://openweathermap.org/payload/api/media/file/03d.png'
+                }else if(data[idx].clouds.all > 3){
+                    Url = 'https://openweathermap.org/payload/api/media/file/02d.png'
+                }else{
+                    Url = 'https://openweathermap.org/payload/api/media/file/01d.png'
+                }
+                item.setAttribute("src", Url)
+            })
+            
+        }
+        getWeather()
+    </script>
+</body>
+</html>
